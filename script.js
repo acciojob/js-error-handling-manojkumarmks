@@ -1,46 +1,45 @@
 //your code here
 class OutOfRangeError extends Error {
-constructor(arg) {
-  super(`Expression should only consist of integers and +-/* characters and not ${arg}`);
-  this.name = "OutOfRangeError";
-}
+    constructor(arg) {
+        super();
+        this.name = "OutOfRangeError";
+        this.message = `Expression should only consist of integers and +-/* characters and not <${arg}>`;
+    }
 }
 
 class InvalidExprError extends Error {
-constructor() {
-  super("Expression should not have an invalid combination of expression");
-  this.name = "InvalidExprError";
-}
+    constructor() {
+        super();
+        this.name = "InvalidExprError";
+        this.message = "Expression should not have an invalid combination of expression";
+    }
 }
 
-document.getElementById("evaluate-button").addEventListener("click", function() {
-try {
-  let expression = document.getElementById("expression").value;
-  // check if expression starts with invalid operator
-  if (["+", "-", "*", "/"].includes(expression[0])) {
-	throw new SyntaxError("Expression should not start with invalid operator");
-  }
-  // check if expression ends with invalid operator
-  if (["+", "-", "*", "/"].includes(expression[expression.length - 1])) {
-	throw new SyntaxError("Expression should not end with invalid operator");
-  }
-  // check for invalid combinations of operators
-  if (/(\+\+|--|\*\*|\/\/)/.test(expression)) {
-	throw new InvalidExprError();
-  }
-  // check if expression only contains valid characters
-  if (!/^[+\-*/\d\s]+$/.test(expression)) {
-	let invalidChar = expression.match(/[^+\-*/\d\s]/)[0];
-	throw new OutOfRangeError(invalidChar);
-  }
-  // evaluate expression
-  let result = eval(expression);
-  document.getElementById("result").innerHTML = `Result: ${result}`;
-} catch (err) {
-  if (err instanceof OutOfRangeError || err instanceof InvalidExprError || err instanceof SyntaxError) {
-	document.getElementById("result").innerHTML = `Error: ${err.message}`;
-  } else {
-	throw err;
-  }
+function evalString(expr) {
+    try {
+        // Check for invalid combinations of operators
+        if (/[+\-*/]{2,}/.test(expr)) {
+            throw new InvalidExprError();
+        }
+        // Check if expression starts with an invalid operator
+        if (expr[0] === "+" || expr[0] === "-" || expr[0] === "*" || expr[0] === "/") {
+            throw new SyntaxError("Expression should not start with invalid operator");
+        }
+        // Check if expression ends with an invalid operator
+        if (expr[expr.length - 1] === "+" || expr[expr.length - 1] === "-" || expr[expr.length - 1] === "*" || expr[expr.length - 1] === "/") {
+            throw new SyntaxError("Expression should not end with invalid operator");
+        }
+        // Check for any other non-integer, non-operator characters
+        if (!/^[\d+\-*/\s]+$/.test(expr)) {
+            throw new OutOfRangeError(expr);
+        }
+        // Evaluate the expression if all checks pass
+        return eval(expr);
+    } catch (err) {
+        if (err instanceof OutOfRangeError || err instanceof InvalidExprError) {
+            console.error(err.name + ": " + err.message);
+        } else {
+            console.error(err.message);
+        }
+    }
 }
-});
