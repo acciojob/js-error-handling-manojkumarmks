@@ -15,32 +15,34 @@ class InvalidExprError extends Error {
   }
 }
 
-function evalString(expr) {
+function evalString() {
   try {
-    // check for invalid combinations of operators
-    if (/[+\-*/]{2,}/.test(expr)) {
+    const expression = document.getElementById("expression").value;
+
+    // check for invalid operator combinations
+    if (/[+\-*/]{2,}/.test(expression)) {
       throw new InvalidExprError();
     }
 
     // check if expression starts with invalid operator
-    if (/^[+*/-]/.test(expr)) {
+    if (/^[+*/-]/.test(expression)) {
       throw new SyntaxError("Expression should not start with invalid operator");
     }
 
     // check if expression ends with invalid operator
-    if (/[+\-*/]$/.test(expr)) {
+    if (/[+\-*/]$/.test(expression)) {
       throw new SyntaxError("Expression should not end with invalid operator");
     }
 
-    // check if expression contains anything other than integers and +-/*
-    if (!/^[\d\s+\-*/]+$/.test(expr)) {
-      let invalidChar = expr.match(/[^\d\s+\-*/]/)[0];
-      throw new OutOfRangeError(invalidChar);
+    // check for any invalid characters
+    if (!/^[\d\s+\-*/]*$/.test(expression)) {
+      throw new OutOfRangeError(expression.match(/[^\d\s+\-*/]/g));
     }
 
-    // evaluate the expression
-    return eval(expr);
-  } catch (err) {
-    console.error(err.name + ": " + err.message);
+    // evaluate expression
+    const result = eval(expression);
+    console.log(result);
+  } catch (error) {
+    console.log(error);
   }
 }
